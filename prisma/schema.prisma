@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator zod {
+  provider = "prisma-zod-generator"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model post {
+  id      Int    @id @default(autoincrement())
+  title   String @db.VarChar(128)
+  body    String @db.VarChar(2048)
+  user_id Int
+  user    user   @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "post_user_id_fk")
+
+  @@index([user_id], map: "post_user_id_fk")
+}
+
+model user {
+  id        Int    @id @unique(map: "users_id_uindex")
+  full_name String @db.VarChar(50)
+  email     String @unique(map: "users_email_uindex") @db.VarChar(320)
+  address   String @db.VarChar(255)
+  post      post[]
+}
